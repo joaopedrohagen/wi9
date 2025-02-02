@@ -1,0 +1,29 @@
+{{- define "net" }}
+{{- $service := .service }}
+{{- $namespace := .namespace }}
+{{- if $service.enabled }}
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ $service.name }}
+  namespace: {{ $namespace }}
+
+spec:
+  selector:
+    app: {{ $service.name }}
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ $service.port }}
+      targetPort: {{ $service.targetPort }}
+      {{ if and $service.nodePort (hasKey $service.nodePort "enabled") $service.nodePort.enabled }}nodePort: {{ $service.nodePort.externalPort }}{{ end }}
+  {{ if and $service.nodePort (hasKey $service.nodePort "enabled") $service.nodePort.enabled }}type: NodePort{{ else }}type: ClusterIP{{ end }}
+{{- end }}
+{{- end }}
+
+{{- range $service := .Values.microservices }}
+  {{- include "net" (dict "service" $service "namespace" $.Values.namespace) }}
+{{ end }}

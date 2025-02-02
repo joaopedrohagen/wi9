@@ -1,0 +1,141 @@
+{{- define "deploy" }}
+{{- $service := .service }}
+{{- $namespace := .namespace }}
+{{- if $service.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $service.name }}
+  namespace: {{ $namespace }}
+
+spec:
+  {{- if $service.replicas }}
+  replicas: {{ $service.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $service.name }}
+
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        app: {{ $service.name }}
+
+    spec:
+      containers:
+
+        - name: {{ $service.name }}
+          image: {{ $service.image }}
+          imagePullPolicy: {{ $service.imagePullPolicy }}
+
+          {{- if and $service.command (hasKey $service.command "enabled") $service.command.enabled }}
+          command: {{ $service.command.run | toJson}}
+          args: {{ $service.command.args | toJson }}
+          {{- end }}
+
+          resources:
+            requests:
+              cpu: {{ $service.cpu.min }}
+              memory: {{ $service.memory.min }}
+            limits:
+              cpu: {{ $service.cpu.max }}
+              memory: {{ $service.memory.max }}
+
+          ports:
+            - containerPort: {{ $service.containerPort }}
+
+          envFrom:
+            - secretRef:
+                name: {{ $service.name }}
+            -  configMapRef:
+                name: {{ $service.name }}
+
+        {{- if and $service.probes (hasKey $service.probes "enabled") $service.probes.enabled }}
+        {{ include "probes" (dict "service" $service "namespace" $namespace) | nindent 10 }}
+        {{- end }}
+
+          {{- if and $service.persistentVolume (hasKey $service.persistentVolume "enabled") $service.persistentVolume.enabled }}
+          volumeMounts:
+            {{- range $service.volumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- if and $service.extraConfigs (hasKey $service.extraConfigs "enabled") $service.extraConfigs.enabled }}
+            {{- range $service.extraConfigs.volumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              subPath: {{ .subPath }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+
+      {{- if and $service.persistentVolume (hasKey $service.persistentVolume "enabled") $service.persistentVolume.enabled }}
+      volumes:
+        {{- range $service.volumeMounts }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .name }}
+        {{- end }}
+        {{- if and $service.extraConfigs (hasKey $service.extraConfigs "enabled") $service.extraConfigs.enabled }}
+        {{- range $service.extraConfigs.volumes }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ $service.name }}
+            items:
+              - key: {{ .key }}
+                path: {{ .path }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+
+      {{- if $service.taints }}
+      tolerations:
+        {{- range $service.taints }}
+        - key: {{ .key }}
+          operator: {{ .operator }}
+          value: {{ .value }}
+          effect: {{ .effect }}
+        {{- end }}
+      {{- end }}
+
+      {{- if and $service.affinity (hasKey $service.affinity "key") $service.affinity.key }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - {{ $service.name }}
+                topologyKey: "kubernetes.io/hostname"
+      {{- end }}
+
+      {{- if $service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                {{- range $service.nodeAffinity }}
+                - key: {{ .key }}
+                  operator: {{ .operator }}
+                  values:
+                    - {{ .value }}
+                {{- end }}
+      {{- end }}
+{{- end }}
+{{- end }}
+
+{{- range $service := .Values.microservices }}
+  {{- include "deploy" (dict "service" $service "namespace" $.Values.namespace) }}
+{{ end }}

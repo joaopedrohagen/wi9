@@ -1,0 +1,22 @@
+{{- define "sc" }}
+{{- $service := .service }}
+{{- if and $service.persistentVolume.enabled $service.enabled }}
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ $service.name }}
+
+provisioner: {{ $service.persistentVolume.provisioner | default "kubernetes.io/no-provisioner" }}
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+{{- end }}
+{{- end }}
+
+{{- range $service := .Values.microservices }}
+  {{- include "sc" (dict "service" $service) }}
+{{ end }}
+
+{{- range $service := .Values.cronjobs }}
+  {{- include "sc" (dict "service" $service) }}
+{{ end }}

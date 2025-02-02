@@ -1,0 +1,49 @@
+
+{{- define "pv" }}
+{{- $service := .service }}
+{{- if and $service.persistentVolume.enabled $service.enabled }}
+{{- range $service.persistentVolume.persistentVolumeConfig }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .name }}
+
+spec:
+    capacity:
+      storage: {{ .storage }}
+
+    accessModes:
+      - ReadWriteMany
+
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: {{ $service.name }}
+    {{- if eq .type "nfs" }}
+
+    nfs:
+      path: {{ .path }}
+      server: {{ .server }}
+
+    {{- else if eq .type "csi" }}
+    csi:
+      driver: {{ .driver }}
+      volumeHandle: {{ .path }}
+
+    {{- else }}
+
+    hostPath:
+      path: {{ .path }}
+    {{- end }}
+    volumeMode: Filesystem
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- range $service := .Values.microservices }}
+  {{- include "pv"  (dict "service" $service) }}
+{{ end }}
+
+{{- range $service := .Values.cronjobs }}
+  {{- include "pv" (dict "service" $service) }}
+{{ end }}

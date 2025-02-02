@@ -1,0 +1,32 @@
+{{- define "pvc" }}
+{{- $service := .service }}
+{{- $namespace := .namespace }}
+{{- if and $service.persistentVolume.enabled $service.enabled }}
+{{- range $service.persistentVolume.persistentVolumeConfig }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}
+  namespace: {{ $namespace }}
+
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ $service.name }}
+
+  resources:
+    requests:
+      storage: {{ .storage }}
+  volumeName: {{ .name }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- range $service := .Values.microservices }}
+  {{- include "pvc" (dict "service" $service "namespace" $.Values.namespace) }}
+{{ end }}
+
+{{- range $service := .Values.cronjobs }}
+  {{- include "pvc" (dict "service" $service "namespace" $.Values.namespace) }}
+{{ end }}

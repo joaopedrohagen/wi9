@@ -1,0 +1,49 @@
+{{- define "ingress" }}
+{{- $service := .service }}
+{{- $namespace := .namespace }}
+{{- if and $service.enabled ($service.ingress) ($service.ingress.enabled) }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $service.name }}
+  namespace: {{ $namespace }}
+  annotations:
+    {{- if and $service.ingress.rewriteTarget (hasKey $service.ingress.rewriteTarget "enabled") $service.ingress.rewriteTarget.enabled }}
+    nginx.ingress.kubernetes.io/rewrite-target: "{{ $service.ingress.rewriteTarget.value }}"
+    {{- end }}
+    ingress.kubernetes.io/force-ssl-redirect: "{{ $service.ingress.forceSSL }}"
+spec:
+  ingressClassName: nginx
+  rules:
+  {{- range $service.ingress.rules }}
+  - host: "{{ .host }}"
+    http:
+      paths:
+      - path: "{{ .path }}"
+        pathType: {{ .pathType }}
+        backend:
+          service:
+            name: {{ $service.ingress.serviceName }}
+            port:
+              number: {{ $service.port }}
+  {{- end }}
+  {{- if and $service.ingress.allDomains (hasKey $service.ingress.allDomains "enabled") $service.ingress.allDomains.enabled }}
+  {{- range $service.ingress.allDomains.config }}
+  - http:
+      paths:
+      - path: "{{ .path }}"
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $service.ingress.serviceName }}
+            port:
+              number: {{ $service.port }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- range $service := .Values.microservices }}
+  {{- include "ingress" (dict "service" $service "namespace" $.Values.namespace) }}
+{{ end }}
