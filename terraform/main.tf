@@ -7,20 +7,20 @@ locals {
 }
 
 variable "cidr_block" {
-  type = string
-  default = "10.0.0.0/16"
+  type        = string
+  default     = "10.0.0.0/16"
   description = "CIDR for VPC"
 }
 
 variable "project" {
-  type = string
-  default = "test-w9"
+  type        = string
+  default     = "test-w9"
   description = "Name of project"
 }
 
 variable "all_ipv4" {
-  type = string
-  default = "0.0.0.0/0"
+  type        = string
+  default     = "0.0.0.0/0"
   description = "All IPV4"
 }
 
