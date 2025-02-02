@@ -1,0 +1,62 @@
+namespace: winovk8s
+
+services:
+  nginx:
+    name: nginx
+    enabled: true
+    # replicas: 3
+    image: nginx:latest
+    imagePullPolicy:  IfNotPresent
+    hpaCpu: 90
+    hpaMemory: 90
+    configMap:
+      - nginx.conf
+      - server.conf
+      - proxy_params
+    containerPort: 80
+    port: 80
+    targetPort: 80
+    nodePort:
+      enabled: true
+      externalPort: 30080
+    ingress:
+      enabled: false
+    command:
+      enabled: false
+    hpaReplicas:
+      min: 1
+      max: 1
+    cpu:
+      min: 0.1
+      max: 1.0
+    memory:
+      min: 100Mi
+      max: 500Mi
+    persistentVolume:
+      enabled: false
+    extraConfigs:
+      enabled: true
+      volumeMounts:
+        - name: nginx.conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: server.conf
+          mountPath: /etc/nginx/conf.d/server.conf
+          subPath: server.conf
+        - name: proxy_params
+          mountPath: /etc/nginx/proxy_params
+          subPath: proxy_params
+      volumes:
+        - name: nginx.conf
+          key: nginx.conf
+          path: nginx.conf
+        - name: server.conf
+          key: server.conf
+          path: server.conf
+        - name: proxy_params
+          key: proxy_params
+          path: proxy_params
+    affinity:
+      enabled: false
+    probes:
+      enabled: false
