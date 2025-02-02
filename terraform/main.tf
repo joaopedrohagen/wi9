@@ -24,19 +24,13 @@ variable "all_ipv4" {
   description = "All IPV4"
 }
 
-variable "tags" {
-  type = string
-  default = locals.tags
-  description = "Tags for project"
-}
-
 resource "aws_vpc" "test_w9_vpc" {
   cidr_block           = var.cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-vpc"
     }
@@ -51,7 +45,7 @@ resource "aws_subnet" "test_w9_subnet_public_1a" {
   availability_zone = "${data.aws_region.current.name}a"
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-subnet-pub-1a",
     }
@@ -62,7 +56,7 @@ resource "aws_internet_gateway" "test_w9_igw" {
   vpc_id = aws_vpc.test_w9_vpc.id
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-igw"
     }
@@ -78,7 +72,7 @@ resource "aws_route_table" "test_w9_pub_rtb" {
   }
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-pub-rtb"
     }
@@ -96,7 +90,7 @@ resource "aws_security_group" "w9" {
   vpc_id      = aws_vpc.test_w9_vpc.id
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-w9-sg"
     }
@@ -142,14 +136,14 @@ resource "aws_instance" "w9_ec2" {
     delete_on_termination = false
 
     tags = merge(
-      var.tags,
+      local.tags,
       {
         Name = "${var.project}-w9-ec2-vol"
       }
     )
   }
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-w9-ec2"
     }
@@ -171,7 +165,7 @@ resource "aws_eip" "w9_ec2_eip" {
   associate_with_private_ip = "10.0.1.10"
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.project}-w9-ec2-eip"
     }
