@@ -37,3 +37,7 @@ terraform.rc
 *.lock.*
 
 .terraform
+
+#Ignore RKE files
+*.rkestate
+*kube_config*
