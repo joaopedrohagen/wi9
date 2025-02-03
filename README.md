@@ -52,7 +52,7 @@ kubectl get nodes --kubeconfig ~/.kube/winov | grep -w "Ready" | wc -l | tee -a 
 
 4. Não possuo experiência com Kubernetes em Bare Metal, porém possuo vasto conhecimento em Kubernetes e muita facilidade em aprender. Possuo experiência em ferramentas como Kustomize, Helm Chart, ArgoCD, EKS, dentre outras.
 
-5. Verificaria os enventos do namespace do ingress, ordenando por timestamp, para tentar descobrir o que pode ter ocorrido. Verificaria de o DaemonSet ou o Deployment dele ainda existe. Olharia os últimos commits do repositório, caso utilizem alguma ferramenta de CI/CD para ver se teve alguma alteração que possa ter deletado o controller. Recuperar o manifesto do controller e aplicá-lo e verificar os Ingresses para validar se estão todos funcionando corretamente. Se estivesse usando um LB, verificaria se ele ainda está associado ao LB correto.
+5. Para iniciar o troubleshooting do controller, eu verificaria os enventos do namespace do ingress, ordenando por timestamp, para tentar descobrir o que pode ter ocorrido. Verificaria de o DaemonSet ou o Deployment dele ainda existe. Olharia os últimos commits do repositório, caso utilizem alguma ferramenta de CI/CD para ver se teve alguma alteração que possa ter deletado o controller. Recuperar o manifesto do controller e aplicá-lo e verificar os Ingresses para validar se estão todos funcionando corretamente. Se estivesse usando um LB, verificaria se ele ainda está associado ao LB correto.
 
 ---
 
