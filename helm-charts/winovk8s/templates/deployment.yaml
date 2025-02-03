@@ -52,8 +52,10 @@ spec:
             - containerPort: {{ $service.containerPort }}
 
           envFrom:
+            {{- if and $service (hasKey $service "secrets") }}
             - secretRef:
                 name: {{ $service.name }}
+            {{- end }}
             -  configMapRef:
                 name: {{ $service.name }}
 
