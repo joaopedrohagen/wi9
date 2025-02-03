@@ -195,7 +195,7 @@ consul:
     persistentVolume:
       enabled: true
       persistentVolumeConfig:
-        - name: data-winovk8s-consul-consul-server-0
+        - name: data-winovk8s-consul-server-0
           storage: 10Gi
           type: nfs
           server: 10.0.1.10
