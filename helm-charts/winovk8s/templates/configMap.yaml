@@ -1,6 +1,7 @@
 {{- define "cm" }}
 {{- $service := .service }}
-{{- $namespace :=  .namespace }}
+{{- $namespace := .namespace }}
+{{- $variables := .variables}}
 {{- if $service.enabled }}
 ---
 apiVersion: v1
@@ -10,9 +11,15 @@ metadata:
   namespace: {{ $namespace }}
 
 data:
-  {{- range  $key, $value := .variables.configMap.services }}
-  {{ $key }}: {{ quote $value }}
+  {{- if eq $service.name "nginx" }}
+  nginx.conf: |
+{{ index $variables.configMap.nginx "nginx.conf" | indent 4}}
+  server.conf: |
+{{ index $variables.configMap.nginx "server.conf" | indent 4}}
+  proxy_params: |
+{{ index $variables.configMap.nginx "server.conf" | indent 4}}
   {{- end }}
+
 {{- end }}
 {{- end }}
 
