@@ -121,7 +121,7 @@ resource "aws_vpc_security_group_egress_rule" "w9_all_traffic" {
 
 resource "aws_instance" "w9_ec2" {
   ami                     = "ami-04b4f1a9cf54c11d0"
-  instance_type           = "t3a.small"
+  instance_type           = "t3a.medium"
   key_name                = "infra-joaopedro"
   subnet_id               = aws_subnet.test_w9_subnet_public_1a.id
   disable_api_termination = true
@@ -132,7 +132,7 @@ resource "aws_instance" "w9_ec2" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 30
+    volume_size           = 70
     delete_on_termination = false
 
     tags = merge(
