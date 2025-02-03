@@ -33,23 +33,23 @@ microservices:
     extraConfigs:
       enabled: true
       volumeMounts:
-        - name: nginx.conf
+        - name: nginx-conf
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
-        - name: server.conf
+        - name: server-conf
           mountPath: /etc/nginx/conf.d/server.conf
           subPath: server.conf
-        - name: proxy_params
+        - name: proxy-params
           mountPath: /etc/nginx/proxy_params
           subPath: proxy_params
       volumes:
-        - name: nginx.conf
+        - name: nginx-conf
           key: nginx.conf
           path: nginx.conf
-        - name: server.conf
+        - name: server-conf
           key: server.conf
           path: server.conf
-        - name: proxy_params
+        - name: proxy-params
           key: proxy_params
           path: proxy_params
     affinity:
@@ -61,7 +61,7 @@ variables:
   configMap:
     nginx:
 
-      nginx.conf: |
+      nginx_conf: |
         user                        www-data;
         worker_processes            auto;
         worker_rlimit_nofile        65535;
@@ -167,7 +167,7 @@ variables:
         proxy_set_header X-Forwarded-Port   $server_port;
         proxy_set_header Host 		          $host;
 
-      server.conf: |
+      server_conf: |
         server {
             listen                                  80;
             listen                                  [::]:80;
@@ -181,7 +181,7 @@ variables:
             add_header Strict-Transport-Security    "max-age=31536000; includeSubDomains; preload" always;
 
             location  / {
-                proxy_pass                          http://consul.winovk8s.svc.cluster.local;
+                proxy_pass                          http://10.0.1.10:30081;
                 include                             /etc/nginx/proxy_params;
                 access_log                          /var/log/nginx/access.log custom_log_format;
                 error_log                           /var/log/nginx/error.log error;
@@ -191,10 +191,6 @@ variables:
         }
 
 consul:
-  enabled: true
-  global:
-    logLevel: error
-    domain: consul.winovk8s.svc.cluster.local
   server:
     persistentVolume:
       enabled: true
@@ -204,9 +200,10 @@ consul:
           type: nfs
           server: 10.0.1.10
           path: /nfs/winov-data
-    storageClass: kubernetes.io/no-provisioner
   ui:
     service:
+      enabled: true
+      type: NodePort
       nodePort:
-        http: 30083
-        https: 30084
+        http: 30081
+        https: 30445
