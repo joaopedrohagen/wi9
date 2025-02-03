@@ -16,7 +16,3 @@ reclaimPolicy: Retain
 {{- range $service := .Values.microservices }}
   {{- include "sc" (dict "service" $service) }}
 {{ end }}
-
-{{- range $service := .Values.cronjobs }}
-  {{- include "sc" (dict "service" $service) }}
-{{ end }}

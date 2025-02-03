@@ -27,6 +27,3 @@ spec:
   {{- include "pvc" (dict "service" $service "namespace" $.Values.namespace) }}
 {{ end }}
 
-{{- range $service := .Values.cronjobs }}
-  {{- include "pvc" (dict "service" $service "namespace" $.Values.namespace) }}
-{{ end }}

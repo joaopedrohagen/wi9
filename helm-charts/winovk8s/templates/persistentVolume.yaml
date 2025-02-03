@@ -43,7 +43,3 @@ spec:
 {{- range $service := .Values.microservices }}
   {{- include "pv"  (dict "service" $service) }}
 {{ end }}
-
-{{- range $service := .Values.cronjobs }}
-  {{- include "pv" (dict "service" $service) }}
-{{ end }}
