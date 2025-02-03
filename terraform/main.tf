@@ -153,9 +153,16 @@ resource "aws_instance" "w9_ec2" {
   #!/bin/bash
   apt-get update
   apt-get upgrade -y
-  apt install docker.io vim htop fish -y
+  apt install docker.io vim htop fish nfs-kernel-server -y
   usermod -aG docker ubuntu
   chsh -s /usr/bin/fish
+  mkdir -p /nfs/winov-data
+  chown -R nobody:nogroup nfs/
+  cat <<EOL >> /etc/exports
+  /nfs/        10.0.1.10(rw,sync,no_root_squash,no_subtree_check)
+  EOL
+  systemctl restart nfs-kernel-server
+  exportfs -rva;
   EOF
 }
 
