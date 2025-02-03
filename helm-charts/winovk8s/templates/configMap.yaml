@@ -13,11 +13,11 @@ metadata:
 data:
   {{- if eq $service.name "nginx" }}
   nginx.conf: |
-{{ index $variables.configMap.nginx "nginx.conf" | indent 4}}
+{{ index $variables.configMap.nginx "nginx_conf" | indent 4}}
   server.conf: |
-{{ index $variables.configMap.nginx "server.conf" | indent 4}}
+{{ index $variables.configMap.nginx "server_conf" | indent 4}}
   proxy_params: |
-{{ index $variables.configMap.nginx "server.conf" | indent 4}}
+{{ index $variables.configMap.nginx "proxy_params" | indent 4}}
   {{- end }}
 
 {{- end }}
