@@ -1,6 +1,8 @@
 
 {{- define "pv" }}
 {{- $service := .service }}
+{{- $namespace := .namespace }}
+{{- if and (kindIs "map" $service) (hasKey $service "persistentVolume") (hasKey $service.persistentVolume "enabled") (hasKey $service "enabled") }}
 {{- if and $service.persistentVolume.enabled $service.enabled }}
 {{- range $service.persistentVolume.persistentVolumeConfig }}
 ---
@@ -38,8 +40,14 @@ spec:
 {{- end }}
 {{- end }}
 {{- end }}
+{{- end }}
 
 
 {{- range $service := .Values.microservices }}
   {{- include "pv"  (dict "service" $service) }}
 {{ end }}
+
+{{- if .Values.consul.server }}
+  {{- include "pv" (dict "service" .Values.consul.server) }}
+{{ end }}
+
