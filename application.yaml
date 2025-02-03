@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: winovk8s
+  namespace: argocd
+spec:
+  project: default
+  sources:
+
+    - repoURL: 'https://github.com/joaopedrohagen/wi9.git'
+      targetRevision: main
+      path: helm-charts/winovk8s/
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: winovk8s
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
