@@ -56,5 +56,5 @@ kubectl get nodes --kubeconfig ~/.kube/winov | grep -w "Ready" | wc -l | tee -a 
 
 ---
 
-Pessoal, espero ter atendido à todas as questões que foram solicitadas. Quaisquer dúvidas, estou à disposição. É um imenso prazer participar desse processo com vocês! 😉
+Pessoal, espero ter atendido à todas as questões que foram solicitadas. Quaisquer dúvidas, estou à disposição. É um imenso prazer participar dessa atividade com vocês! 😉
 
