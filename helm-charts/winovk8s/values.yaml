@@ -9,7 +9,6 @@ microservices:
     imagePullPolicy:  IfNotPresent
     hpaCpu: 90
     hpaMemory: 90
-    secrets: []
     containerPort: 80
     port: 80
     targetPort: 80
@@ -190,3 +189,24 @@ variables:
                 limit_req_status                    429;
             }
         }
+
+consul:
+  enabled: true
+  global:
+    logLevel: error
+    domain: consul.winovk8s.svc.cluster.local
+  server:
+    persistentVolume:
+      enabled: true
+      persistentVolumeConfig:
+        - name: data-winovk8s-consul-consul-server-0
+          storage: 10Gi
+          type: nfs
+          server: 10.0.1.10
+          path: /nfs/winov-data
+    storageClass: kubernetes.io/no-provisioner
+  ui:
+    service:
+      nodePort:
+        http: 30083
+        https: 30084
