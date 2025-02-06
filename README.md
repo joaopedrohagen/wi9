@@ -26,6 +26,8 @@ kubectl apply -f application.yaml --kubeconfig ~/.kube/winov
 
 > A aplicação do Consul está disponível no IP `23.21.116.56` na porta `30081`. Como o ambiente é controlado e isolado das minhas demais aplicações, decidi liberar o acesso por um determinado tempo antes de eu dar um `terraform destroy` 🤗.
 
+> OBS: Já rodei o `terraform destroy` 🫶🏻🥹❤️‍🩹
+
 ![consul.png](png/2025-02-03_14-46.png)
 
 * Esses foram os recursos instalados com o meu Chart:
